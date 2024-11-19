@@ -30,7 +30,7 @@ type (
 )
 
 func NewRouter() Router {
-	return &Mux{ServeMux: &http.ServeMux{}}
+	return &Mux{ServeMux: &http.ServeMux{}, chain: make([]Middleware, 0)}
 }
 
 func (r *Mux) Use(mws ...Middleware) {
@@ -70,7 +70,7 @@ func (r *Mux) Patch(path string, fn http.HandlerFunc, mx ...Middleware) {
 }
 
 func (r *Mux) Mount(path string, sub *Mux) {
-	r.Handle(path, sub)
+	r.Handle(path, http.StripPrefix(path, sub))
 }
 
 func (r *Mux) handle(method, path string, handler http.HandlerFunc, mx []Middleware) {
@@ -78,12 +78,11 @@ func (r *Mux) handle(method, path string, handler http.HandlerFunc, mx []Middlew
 }
 
 func (r *Mux) chainWrap(fn http.Handler, mx []Middleware) http.Handler {
+	out := fn
+	mx = append(slices.Clone(r.chain), mx...)
 	if len(mx) == 0 {
 		return fn
 	}
-	out := fn
-	mx = append(slices.Clone(r.chain), mx...)
-
 	slices.Reverse(mx)
 
 	for _, m := range mx {

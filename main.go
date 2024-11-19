@@ -14,7 +14,7 @@ func main() {
 		router.Get("/ping", func(writer http.ResponseWriter, request *http.Request) {
 			writer.Write([]byte("pong"))
 		})
-		router.Get("/hello", func(writer http.ResponseWriter, request *http.Request) {
+		router.Post("/hello", func(writer http.ResponseWriter, request *http.Request) {
 			panic(fmt.Errorf("error"))
 		})
 	})
