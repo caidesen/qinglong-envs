@@ -1,14 +1,22 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"log"
+	"fmt"
+	"net/http"
+	_ "qinglong-envs/pkg/env"
+	"qinglong-envs/pkg/server"
 )
 
 func main() {
-	app := fiber.New()
-	app.Get("", func(ctx *fiber.Ctx) error {
-		return ctx.SendString("qinglong-envs")
+	conf := server.LoadHttpConfigFormEnv()
+	httpServer := server.New(conf)
+	httpServer.Register(func(router server.Router) {
+		router.Get("/ping", func(writer http.ResponseWriter, request *http.Request) {
+			writer.Write([]byte("pong"))
+		})
+		router.Get("/hello", func(writer http.ResponseWriter, request *http.Request) {
+			panic(fmt.Errorf("error"))
+		})
 	})
-	log.Fatal(app.Listen("0.0.0.0:3000"))
+	httpServer.Start()
 }
