@@ -1,43 +1,24 @@
-package server
+package router
 
 import (
 	"net/http"
 	"slices"
 )
 
-type Router interface {
-	http.Handler
-	Use(mws ...Middleware)
-	Group(func(r *Mux))
-
-	Get(path string, fn http.HandlerFunc, mx ...Middleware)
-	Post(path string, fn http.HandlerFunc, mx ...Middleware)
-	Put(path string, fn http.HandlerFunc, mx ...Middleware)
-	Patch(path string, fn http.HandlerFunc, mx ...Middleware)
-	Delete(path string, fn http.HandlerFunc, mx ...Middleware)
-	Options(path string, fn http.HandlerFunc, mx ...Middleware)
-	Head(path string, fn http.HandlerFunc, mx ...Middleware)
-
-	Mount(path string, sub *Mux)
+type Mux struct {
+	*http.ServeMux
+	chain []Middleware
 }
 
-type (
-	Middleware func(http.Handler) http.Handler
-	Mux        struct {
-		*http.ServeMux
-		chain []Middleware
-	}
-)
-
 func NewRouter() Router {
-	return &Mux{ServeMux: &http.ServeMux{}, chain: make([]Middleware, 0)}
+	return &Mux{ServeMux: &http.ServeMux{}}
 }
 
 func (r *Mux) Use(mws ...Middleware) {
 	r.chain = append(r.chain, mws...)
 }
 
-func (r *Mux) Group(fn func(r *Mux)) {
+func (r *Mux) Group(fn func(r Router)) {
 	fn(&Mux{ServeMux: r.ServeMux, chain: slices.Clone(r.chain)})
 }
 
@@ -69,7 +50,7 @@ func (r *Mux) Patch(path string, fn http.HandlerFunc, mx ...Middleware) {
 	r.handle(http.MethodPatch, path, fn, mx)
 }
 
-func (r *Mux) Mount(path string, sub *Mux) {
+func (r *Mux) Mount(path string, sub Router) {
 	r.Handle(path, http.StripPrefix(path, sub))
 }
 
@@ -84,7 +65,6 @@ func (r *Mux) chainWrap(fn http.Handler, mx []Middleware) http.Handler {
 		return fn
 	}
 	slices.Reverse(mx)
-
 	for _, m := range mx {
 		out = m(out)
 	}

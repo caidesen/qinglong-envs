@@ -1,20 +1,20 @@
-package server
+package middleware
 
 import (
-	"log"
+	"fmt"
+	"log/slog"
 	"net/http"
+	"runtime/debug"
 )
 
 func RecoverMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Println(err)
+				stack := string(debug.Stack())
+				slog.Error(fmt.Sprintf("recover error: %v", err),
+					slog.String("stack", stack))
 				http.Error(w, "internal server error", http.StatusInternalServerError)
-				//ErrorHandler(w, NewHttpError(http.StatusInternalServerError, "internal server error"))
-				if r.Header.Get("Connection") != "Upgrade" {
-					w.WriteHeader(http.StatusInternalServerError)
-				}
 			}
 		}()
 		next.ServeHTTP(w, r)

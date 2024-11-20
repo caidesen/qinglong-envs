@@ -1,22 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	_ "qinglong-envs/pkg/env"
+	"qinglong-envs/pkg/middleware"
+	"qinglong-envs/pkg/router"
 	"qinglong-envs/pkg/server"
 )
 
 func main() {
-	conf := server.LoadHttpConfigFormEnv()
-	httpServer := server.New(conf)
-	httpServer.Register(func(router server.Router) {
-		router.Get("/ping", func(writer http.ResponseWriter, request *http.Request) {
+	r := router.NewRouter()
+	r.Use(middleware.RecoverMiddleware)
+	r.Group(func(g router.Router) {
+		g.Get("/ping", func(writer http.ResponseWriter, request *http.Request) {
 			writer.Write([]byte("pong"))
 		})
-		router.Post("/hello", func(writer http.ResponseWriter, request *http.Request) {
-			panic(fmt.Errorf("error"))
-		})
 	})
-	httpServer.Start()
+	server.StartHttpServer(r)
 }

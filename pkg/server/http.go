@@ -4,67 +4,33 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"net"
 	"net/http"
 	"os"
 	"strconv"
 )
 
-type HttpConfig struct {
-	Port int
-	Host string
-}
-
-func DefaultHttpConfig() HttpConfig {
-	return HttpConfig{
-		Port: 3000,
-		Host: "0.0.0.0",
-	}
-}
-
-func LoadHttpConfigFormEnv() HttpConfig {
-	c := DefaultHttpConfig()
+func LoadListeningFormEnv() string {
+	port := 3000
+	host := "127.0.0.1"
 	portEnv := os.Getenv("QINGLONG_ENVS_SERVER_PORT")
 	hostEnv := os.Getenv("QINGLONG_ENVS_SERVER_HOST")
 	// to int
-	port, err := strconv.Atoi(portEnv)
-	if err != nil {
-		slog.Warn("load env QINGLONG_ENVS_SERVER_PORT: %s", err)
-	} else {
-		c.Port = port
+	portEnvInt, _ := strconv.Atoi(portEnv)
+	if portEnvInt != 0 {
+		port = portEnvInt
 	}
-	ipOK := net.ParseIP(hostEnv)
-	if ipOK != nil {
-		c.Host = hostEnv
+	if hostEnv != "" {
+		host = hostEnv
 	}
-	return c
+	return fmt.Sprintf("%s:%d", host, port)
 }
 
-type HttpServer struct {
-	conf   HttpConfig
-	router Router
-}
-
-func New(conf HttpConfig) HttpServer {
-	r := NewRouter()
-	r.Use(RecoverMiddleware)
-	//r.Use(Middleware.Recoverer)
-	return HttpServer{
-		conf:   conf,
-		router: r,
-	}
-}
-
-func (s *HttpServer) Start() {
-	addr := fmt.Sprintf("%s:%d", s.conf.Host, s.conf.Port)
+func StartHttpServer(h http.Handler) {
+	addr := LoadListeningFormEnv()
 	server := &http.Server{
 		Addr:    addr,
-		Handler: s.router,
+		Handler: h,
 	}
 	slog.Info(fmt.Sprintf("listening on %s", addr))
 	log.Fatal(server.ListenAndServe())
-}
-
-func (s *HttpServer) Register(fn func(Router)) {
-	fn(s.router)
 }
