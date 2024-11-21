@@ -1,48 +1,50 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
+// RFC9457 https://www.rfc-editor.org/rfc/rfc9457.html
+type HttpErrorDetail struct {
+	Detail  string `json:"detail,omitempty"`
+	Pointer string `json:"pointer,omitempty"`
+}
+
 type HTTPError struct {
-	Code     int
-	Message  interface{}
-	Internal error `json:"-"` // Stores the error returned by an external dependency
+	Type     string            `json:"type"`
+	Title    string            `json:"title"`
+	Status   int               `json:"status,omitempty"`
+	Detail   string            `json:"detail,omitempty"`
+	Instance string            `json:"instance,omitempty"`
+	Errors   []HttpErrorDetail `json:"errors,omitempty"`
 }
 
 // Error makes it compatible with `error` interface.
 func (he *HTTPError) Error() string {
-	if he.Internal == nil {
-		return fmt.Sprintf("code=%d, message=%v", he.Code, he.Message)
+	if he.Title == "" && he.Detail == "" {
+		return fmt.Sprintf("Status %d", he.Status)
 	}
-	return fmt.Sprintf("code=%d, message=%v, internal=%v", he.Code, he.Message, he.Internal)
+
+	if he.Detail == "" {
+		return fmt.Sprintf("%s", he.Title)
+	}
+	return fmt.Sprintf("%s: %s", he.Title, he.Detail)
 }
 
-func NewHttpError(code int, message string) error {
+func New(statusCode int, problemType, title, detail, instance string, errors []HttpErrorDetail) *HTTPError {
+	if problemType == "" {
+		problemType = "about:blank"
+	}
+	if problemType == "about:blank" {
+		title = http.StatusText(statusCode)
+	}
 	return &HTTPError{
-		Code:    code,
-		Message: message,
+		Type:     problemType,
+		Title:    title,
+		Status:   statusCode,
+		Detail:   detail,
+		Instance: instance,
+		Errors:   errors,
 	}
-}
-
-type ErrorResponse struct {
-	Msg     string `json:"msg"`
-	ErrCode int    `json:"errCode"`
-}
-
-func ErrorHandler(w http.ResponseWriter, err error) {
-	httpStatus := http.StatusInternalServerError
-	resp := ErrorResponse{
-		Msg:     err.Error(),
-		ErrCode: -1,
-	}
-	httpErr, ok := err.(*HTTPError)
-	if ok {
-		httpStatus = httpErr.Code
-	}
-	w.WriteHeader(httpStatus)
-	marshal, _ := json.Marshal(resp)
-	w.Write(marshal)
 }

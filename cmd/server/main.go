@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "qinglong-envs/pkg/env"
 	"qinglong-envs/pkg/middleware"
 	"qinglong-envs/pkg/router"
 	"qinglong-envs/pkg/server"
