@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 )
 
-func RecoverMiddleware(next http.Handler) http.Handler {
+func Recovery(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
