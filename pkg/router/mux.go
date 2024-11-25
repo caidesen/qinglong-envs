@@ -7,46 +7,55 @@ import (
 
 type Mux struct {
 	*http.ServeMux
-	chain []Middleware
+	chain  []Middleware
+	prefix string
 }
 
-func NewRouter() Router {
-	return &Mux{ServeMux: &http.ServeMux{}}
+func NewRouter(prefix ...string) Router {
+	m := Mux{ServeMux: &http.ServeMux{}}
+	if len(prefix) > 0 {
+		m.prefix = prefix[0]
+	}
+	return &m
 }
 
 func (r *Mux) Use(mws ...Middleware) {
 	r.chain = append(r.chain, mws...)
 }
 
-func (r *Mux) Group(fn func(r Router)) {
-	fn(&Mux{ServeMux: r.ServeMux, chain: slices.Clone(r.chain)})
+func (r *Mux) Group(fn func(Router)) {
+	fn(&Mux{ServeMux: r.ServeMux, chain: slices.Clone(r.chain), prefix: r.prefix})
 }
 
-func (r *Mux) Get(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) GroupWithPrefix(prefix string, fn func(Router)) {
+	fn(&Mux{ServeMux: r.ServeMux, chain: slices.Clone(r.chain), prefix: r.prefix + prefix})
+}
+
+func (r *Mux) Get(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodGet, path, fn, mx)
 }
 
-func (r *Mux) Post(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) Post(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodPost, path, fn, mx)
 }
 
-func (r *Mux) Put(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) Put(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodPut, path, fn, mx)
 }
 
-func (r *Mux) Delete(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) Delete(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodDelete, path, fn, mx)
 }
 
-func (r *Mux) Head(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) Head(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodHead, path, fn, mx)
 }
 
-func (r *Mux) Options(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) Options(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodOptions, path, fn, mx)
 }
 
-func (r *Mux) Patch(path string, fn http.HandlerFunc, mx ...Middleware) {
+func (r *Mux) Patch(path string, fn http.Handler, mx ...Middleware) {
 	r.handle(http.MethodPatch, path, fn, mx)
 }
 
@@ -54,8 +63,8 @@ func (r *Mux) Mount(path string, sub Router) {
 	r.Handle(path, http.StripPrefix(path, sub))
 }
 
-func (r *Mux) handle(method, path string, handler http.HandlerFunc, mx []Middleware) {
-	r.Handle(method+" "+path, r.chainWrap(handler, mx))
+func (r *Mux) handle(method, path string, handler http.Handler, mx []Middleware) {
+	r.Handle(method+" "+r.prefix+path, r.chainWrap(handler, mx))
 }
 
 func (r *Mux) chainWrap(fn http.Handler, mx []Middleware) http.Handler {
