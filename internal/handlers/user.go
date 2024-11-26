@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"qinglong-envs/internal/services"
 	"qinglong-envs/pkg/api"
@@ -24,25 +23,25 @@ func (h *UserHandler) Register(r router.Router) {
 }
 
 func (h *UserHandler) register(w http.ResponseWriter, r *http.Request) error {
-	input := services.UsernamePasswordInput{}
-	if err := api.BindJSONBody(&input, r); err != nil {
-		return err
-	}
-	resp, err := h.userService.Register(r.Context(), &input)
+	input, err := api.BindJSONBody[services.UsernamePasswordInput](r)
 	if err != nil {
 		return err
 	}
-	return json.NewEncoder(w).Encode(resp)
+	resp, err := h.userService.Register(r.Context(), input)
+	if err != nil {
+		return err
+	}
+	return api.JSON(w, resp)
 }
 
 func (h *UserHandler) loginByLocal(w http.ResponseWriter, r *http.Request) error {
-	input := services.UsernamePasswordInput{}
-	if err := api.BindJSONBody(&input, r); err != nil {
-		return err
-	}
-	resp, err := h.userService.LoginByLocal(r.Context(), &input)
+	input, err := api.BindJSONBody[services.UsernamePasswordInput](r)
 	if err != nil {
 		return err
 	}
-	return json.NewEncoder(w).Encode(resp)
+	resp, err := h.userService.LoginByLocal(r.Context(), input)
+	if err != nil {
+		return err
+	}
+	return api.JSON(w, resp)
 }

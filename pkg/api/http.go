@@ -40,15 +40,26 @@ func StartHttpServer(h http.Handler) {
 var InvalidJSONError = ValidateError("invalid json body")
 var InvalidContentTypeError = ValidateError("invalid content type")
 
-func BindJSONBody(i any, r *http.Request) error {
+func BindJSONBody[T any](r *http.Request) (*T, error) {
+	i := new(T)
 	if r.Header.Get("Content-Type") != "application/json" {
-		return InvalidContentTypeError
+		return nil, InvalidContentTypeError
 	}
 	err := json.NewDecoder(r.Body).Decode(i)
 	if err != nil {
-		return InvalidJSONError
+		return nil, InvalidJSONError
 	}
-	return nil
+	return i, nil
+}
+
+func JSON(w http.ResponseWriter, resp any) error {
+	if resp == nil {
+		w.WriteHeader(http.StatusNoContent)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	return json.NewEncoder(w).Encode(resp)
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
