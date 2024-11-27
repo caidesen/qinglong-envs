@@ -1,4 +1,4 @@
--- name: GetUserById :one
+-- name: GetUserByID :one
 SELECT *
 FROM users
 WHERE id = ?
@@ -25,5 +25,6 @@ RETURNING *;
 UPDATE users
 SET username    = ?,
     password    = ?,
-    wx_pusher_uid = ?
+    wx_pusher_uid = ?,
+    updated_at = CURRENT_TIMESTAMP
 WHERE id = ?

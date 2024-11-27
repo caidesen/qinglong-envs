@@ -31,7 +31,7 @@ func (h *UserHandler) register(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	return api.JSON(w, resp)
+	return api.Response(w, resp)
 }
 
 func (h *UserHandler) loginByLocal(w http.ResponseWriter, r *http.Request) error {
@@ -43,5 +43,5 @@ func (h *UserHandler) loginByLocal(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return err
 	}
-	return api.JSON(w, resp)
+	return api.Response(w, resp)
 }

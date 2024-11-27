@@ -40,19 +40,28 @@ func StartHttpServer(h http.Handler) {
 var InvalidJSONError = ValidateError("invalid json body")
 var InvalidContentTypeError = ValidateError("invalid content type")
 
-func BindJSONBody[T any](r *http.Request) (*T, error) {
-	i := new(T)
-	if r.Header.Get("Content-Type") != "application/json" {
-		return nil, InvalidContentTypeError
-	}
-	err := json.NewDecoder(r.Body).Decode(i)
+func GetIntInPath(r *http.Request, name string) (int, error) {
+	pathId := r.PathValue(name)
+	id, err := strconv.Atoi(pathId)
 	if err != nil {
-		return nil, InvalidJSONError
+		return 0, ValidateError("invalid id")
+	}
+	return id, nil
+}
+
+func BindJSONBody[T any](r *http.Request) (T, error) {
+	var i T
+	if r.Header.Get("Content-Type") != "application/json" {
+		return i, InvalidContentTypeError
+	}
+	err := json.NewDecoder(r.Body).Decode(&i)
+	if err != nil {
+		return i, InvalidJSONError
 	}
 	return i, nil
 }
 
-func JSON(w http.ResponseWriter, resp any) error {
+func Response(w http.ResponseWriter, resp any) error {
 	if resp == nil {
 		w.WriteHeader(http.StatusNoContent)
 		return nil
@@ -62,20 +71,36 @@ func JSON(w http.ResponseWriter, resp any) error {
 	return json.NewEncoder(w).Encode(resp)
 }
 
+func ErrorHandler(w http.ResponseWriter, err error) {
+	var httpErr *HTTPError
+	if !errors.As(err, &httpErr) {
+		httpErr = InternalError(err.Error())
+	}
+	httpErr.Out(w)
+}
+
 type Handler func(w http.ResponseWriter, r *http.Request) error
 
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h(w, r)
 	if err != nil {
-		var httpErr *HTTPError
-		if errors.As(err, &httpErr) {
-			err.(*HTTPError).Out(w)
-		} else {
-			InternalError(err.Error()).Out(w)
-		}
+		ErrorHandler(w, err)
+	} else {
+		w.Header().Set("Content-Length", "0")
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
-func PostApi() {
+type PaginationParams struct {
+	PageSize int `json:"limit"`
+	Current  int `json:"current"`
+}
 
+func (p *PaginationParams) Offset() int {
+	return (p.Current - 1) * p.PageSize
+}
+
+type Pagination struct {
+	Current int `json:"current"`
+	Total   int `json:"total"`
 }

@@ -6,10 +6,52 @@ package queries
 
 import (
 	"database/sql"
+	"time"
 )
 
+type Panel struct {
+	ID           int       `json:"id,string"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+	Name         string    `json:"name"`
+	Url          string    `json:"url"`
+	ClientID     string    `json:"clientId"`
+	ClientSecret string    `json:"clientSecret"`
+}
+
+type PanelProject struct {
+	ID        int       `json:"id,string"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	PanelID   int       `json:"panelId"`
+	ProjectID int       `json:"projectId"`
+}
+
+type Project struct {
+	ID          int       `json:"id,string"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	EnvName     string    `json:"envName"`
+	EnvLimit    int       `json:"envLimit"`
+	Enabled     bool      `json:"enabled"`
+}
+
+type ProjectUser struct {
+	ID        int       `json:"id,string"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	ProjectID int       `json:"projectId"`
+	UserID    int       `json:"userId"`
+	EnvValue  string    `json:"envValue"`
+	Enabled   bool      `json:"enabled"`
+}
+
 type User struct {
-	ID          int64          `json:"id"`
+	ID          int            `json:"id,string"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt"`
 	Username    string         `json:"username"`
 	Password    sql.NullString `json:"password"`
 	WxPusherUID sql.NullString `json:"wxPusherUid"`

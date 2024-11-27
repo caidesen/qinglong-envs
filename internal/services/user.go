@@ -24,14 +24,14 @@ func NewUserService(conn *sql.DB, tokenService *TokenService) *UserService {
 }
 
 type User struct {
-	Id          int64  `json:"id,string"`
+	Id          int    `json:"id,string"`
 	Username    string `json:"username"`
 	Password    string `json:"-"`
 	WxPusherUid string `json:"wxPusherUID"`
 }
 
-func (s *UserService) FindUserById(ctx context.Context, id int64) (*User, error) {
-	user, err := s.queries.GetUserById(ctx, id)
+func (s *UserService) GetUserById(ctx context.Context, id int) (*User, error) {
+	user, err := s.queries.GetUserByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ type LoginSuccess struct {
 	Token string `json:"token"`
 }
 
-func (s *UserService) LoginByLocal(ctx context.Context, input *UsernamePasswordInput) (*LoginSuccess, error) {
+func (s *UserService) LoginByLocal(ctx context.Context, input UsernamePasswordInput) (*LoginSuccess, error) {
 	user, err := s.queries.GetUserByUsername(ctx, input.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -84,7 +84,7 @@ func (s *UserService) LoginByLocal(ctx context.Context, input *UsernamePasswordI
 	return &LoginSuccess{Token: token}, nil
 }
 
-func (s *UserService) Register(ctx context.Context, input *UsernamePasswordInput) (*User, error) {
+func (s *UserService) Register(ctx context.Context, input UsernamePasswordInput) (*User, error) {
 	password, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (s *UserService) Register(ctx context.Context, input *UsernamePasswordInput
 	user, err := s.queries.CreateUser(ctx, queries.CreateUserParams{
 		Username:    input.Username,
 		Password:    sql.NullString{String: string(password), Valid: true},
-		WxPusherUID: sql.NullString{String: "", Valid: false},
+		WxPusherUID: sql.NullString{},
 	})
 	if err != nil {
 		return nil, err

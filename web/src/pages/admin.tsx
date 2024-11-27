@@ -65,12 +65,16 @@ function RouteComponent() {
   return (
     <>
       <div className="bg-gray-100 border-b pt-4 mb-6">
-        <div className="w-[90%] max-w-screen-xl mx-auto">
-          <div>QingLong ENVS</div>
-          <Nav></Nav>
+        <div className="container mx-auto">
+          <div className="text-lg font-bold">QingLong ENVS</div>
+          <div className="-mx-2 mt-4">
+            <Nav></Nav>
+          </div>
         </div>
       </div>
-      <Outlet />
+      <div className="container mx-auto">
+        <Outlet />
+      </div>
     </>
   )
 }

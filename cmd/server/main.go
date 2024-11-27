@@ -55,11 +55,13 @@ func main() {
 	// service 初始化
 	tokenService := services.NewTokenService(kvStore)
 	userService := services.NewUserService(db, tokenService)
+	panelServer := services.NewPanelServer(db)
 	// 注册路由
 	r := router.NewRouter()
 	r.Use(middleware.Recovery)
 	r.GroupWithPrefix("/api", func(ar router.Router) {
 		ar.Group(handlers.NewUserHandler(userService).Register)
+		ar.Group(handlers.NewPanelHandler(panelServer).Register)
 	})
 	api.StartHttpServer(r)
 }

@@ -18,10 +18,10 @@ func NewTokenService(store kv.Store) *TokenService {
 }
 
 type TokenPayload struct {
-	UserId int64 `json:"userId"`
+	UserId int `json:"userId"`
 }
 
-func (s *TokenService) CreateToken(ctx context.Context, userId int64) (string, error) {
+func (s *TokenService) CreateToken(ctx context.Context, userId int) (string, error) {
 	token := uuid.NewString()
 	tp, err := json.Marshal(TokenPayload{UserId: userId})
 	if err != nil {

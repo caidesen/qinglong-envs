@@ -7,9 +7,17 @@ sql:
       go:
         package: "queries"
         out: "internal/db/queries"
-        emit_json_tags: true
+        sql_package: ""
         json_tags_case_style: camel
         emit_result_struct_pointers: true
+        emit_json_tags: true
         initialisms:
           - "id"
           - "uid"
+        overrides:
+          - column: "*.id"
+            go_struct_tag: json:"id,string"
+          - db_type: "INTEGER"
+            go_type: "int"
+          - db_type: "integer"
+            go_type: "int"
