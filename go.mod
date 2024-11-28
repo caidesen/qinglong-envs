@@ -8,3 +8,5 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.24
 	golang.org/x/crypto v0.29.0
 )
+
+require github.com/danielgtaylor/huma/v2 v2.26.0

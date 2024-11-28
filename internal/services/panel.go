@@ -31,13 +31,15 @@ func (s *PanelServer) GetPanelById(ctx context.Context, id int) (*queries.Panel,
 	return panel, nil
 }
 
-func (s *PanelServer) ListPanels(ctx context.Context, input api.PaginationParams) ([]*queries.Panel, error) {
+func (s *PanelServer) ListPanels(ctx context.Context, input api.PaginationParams) (*api.Pagination[queries.Panel], error) {
 	queryParams := queries.ListPanelsParams{Limit: input.Current, Offset: input.Offset()}
 	panels, err := s.queries.ListPanels(ctx, queryParams)
 	if err != nil {
 		return nil, err
 	}
-	return panels, nil
+	return &api.Pagination[queries.Panel]{
+		List: panels,
+	}, nil
 }
 
 func (s *PanelServer) CreatePanel(ctx context.Context, input queries.CreatePanelParams) (*queries.Panel, error) {

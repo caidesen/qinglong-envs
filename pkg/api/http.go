@@ -92,15 +92,16 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type PaginationParams struct {
-	PageSize int `json:"limit"`
-	Current  int `json:"current"`
+	PageSize int `query:"limit"`
+	Current  int `query:"current"`
 }
 
 func (p *PaginationParams) Offset() int {
 	return (p.Current - 1) * p.PageSize
 }
 
-type Pagination struct {
-	Current int `json:"current"`
-	Total   int `json:"total"`
+type Pagination[T any] struct {
+	Current int  `json:"current"`
+	Total   int  `json:"total"`
+	List    []*T `json:"list"`
 }

@@ -20,12 +20,18 @@ importers:
       '@nextui-org/theme':
         specifier: ^2.2.11
         version: 2.2.11(tailwindcss@3.4.15)
+      '@tanstack/react-query':
+        specifier: ^5.61.5
+        version: 5.61.5(react@18.3.1)
       '@tanstack/react-router':
         specifier: ^1.82.11
         version: 1.82.11(@tanstack/router-generator@1.82.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       framer-motion:
         specifier: ^11.11.17
         version: 11.11.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      ky:
+        specifier: ^1.7.2
+        version: 1.7.2
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1033,6 +1039,14 @@ packages:
     resolution: {integrity: sha512-9MPknhhnvZKifK4jSvva6NDqYQwsNaptrRzO4ejk6yCLyi4koVG4u3C4VCeClYZY5etLEQbO8wXU9knEFZpMeg==}
     engines: {node: '>=12'}
 
+  '@tanstack/query-core@5.61.5':
+    resolution: {integrity: sha512-iG5vqurEOEbv+paP6kW3zPENa99kSIrd1THISJMaTwVlJ+N5yjVDNOUwp9McK2DWqWCXM3v13ubBbAyhxT78UQ==}
+
+  '@tanstack/react-query@5.61.5':
+    resolution: {integrity: sha512-rjy8aqPgBBEz/rjJnpnuhi8TVkVTorMUsJlM3lMvrRb5wK6yzfk34Er0fnJ7w/4qyF01SnXsLB/QsTBsLF5PaQ==}
+    peerDependencies:
+      react: ^18 || ^19
+
   '@tanstack/react-router@1.82.11':
     resolution: {integrity: sha512-qe1CqBbVrjsBTdNKvP9dNQq4BlDstcHX+u7Rkc5DQVRfY5wBFca7nKHMWXtE6vJzo6OQfNkDSCBGjFitECc6FA==}
     engines: {node: '>=12'}
@@ -1615,6 +1629,10 @@ packages:
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
+
+  ky@1.7.2:
+    resolution: {integrity: sha512-OzIvbHKKDpi60TnF9t7UUVAF1B4mcqc02z5PIvrm08Wyb+yOcz63GRvEuVxNT18a9E1SrNouhB4W2NNLeD7Ykg==}
+    engines: {node: '>=18'}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -3077,6 +3095,13 @@ snapshots:
 
   '@tanstack/history@1.81.9': {}
 
+  '@tanstack/query-core@5.61.5': {}
+
+  '@tanstack/react-query@5.61.5(react@18.3.1)':
+    dependencies:
+      '@tanstack/query-core': 5.61.5
+      react: 18.3.1
+
   '@tanstack/react-router@1.82.11(@tanstack/router-generator@1.82.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/history': 1.81.9
@@ -3719,6 +3744,8 @@ snapshots:
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
+
+  ky@1.7.2: {}
 
   levn@0.4.1:
     dependencies:
