@@ -5,7 +5,6 @@ import (
 	"qinglong-envs/internal/db/queries"
 	"qinglong-envs/internal/services"
 	"qinglong-envs/pkg/api"
-	"qinglong-envs/pkg/router"
 	"strconv"
 )
 
@@ -19,12 +18,12 @@ func NewPanelHandler(panelServer *services.PanelServer) *PanelHandler {
 	}
 }
 
-func (h *PanelHandler) Register(r router.Router) {
-	r.Post("/panels", api.Handler(h.createPanel))
-	r.Put("/panels", api.Handler(h.updatePanel))
-	r.Delete("/panels/{id}", api.Handler(h.deletePanel))
-	r.Get("/panels/{id}", api.Handler(h.getPanel))
-	r.Get("/panels", api.Handler(h.listPanels))
+func (h *PanelHandler) R(r *http.ServeMux) {
+	r.Handle("Post /api/panels", api.Handler(h.createPanel))
+	r.Handle("Put /api/panels", api.Handler(h.updatePanel))
+	r.Handle("Delete /api/panels/{id}", api.Handler(h.deletePanel))
+	r.Handle("Get /api/panels/{id}", api.Handler(h.getPanel))
+	r.Handle("Get /api/panels", api.Handler(h.listPanels))
 }
 
 func (h *PanelHandler) createPanel(w http.ResponseWriter, r *http.Request) error {

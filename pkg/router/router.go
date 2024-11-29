@@ -16,6 +16,4 @@ type Router interface {
 	Delete(path string, fn http.Handler, mx ...Middleware)
 	Options(path string, fn http.Handler, mx ...Middleware)
 	Head(path string, fn http.Handler, mx ...Middleware)
-
-	Mount(path string, sub Router)
 }
