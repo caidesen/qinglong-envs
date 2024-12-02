@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const createPanel = `-- name: CreatePanel :one
+const createPanel = `-- name: Create :one
 INSERT INTO panels (name, url, client_id, client_secret)
 VALUES (?, ?, ?, ?)
 RETURNING id, created_at, updated_at, name, url, client_id, client_secret
@@ -75,7 +75,7 @@ func (q *Queries) GetPanelByID(ctx context.Context, id int) (*Panel, error) {
 	return &i, err
 }
 
-const listPanels = `-- name: ListPanels :many
+const listPanels = `-- name: List :many
 SELECT id, created_at, updated_at, name, url, client_id, client_secret
 FROM panels
 ORDER BY id
@@ -118,7 +118,7 @@ func (q *Queries) ListPanels(ctx context.Context, arg ListPanelsParams) ([]*Pane
 	return items, nil
 }
 
-const updatePanel = `-- name: UpdatePanel :exec
+const updatePanel = `-- name: Update :exec
 UPDATE panels
 SET name          = ?,
     url           = ?,

@@ -3,14 +3,14 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"qinglong-envs/pkg/api"
+	"qinglong-envs/pkg/httpapi"
 )
 
 func BindParamsID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := api.GetIntInPath(r, "id")
+		id, err := httpapi.GetIntInPath(r, "id")
 		if err != nil {
-			api.ErrorHandler(w, err)
+			httpapi.ErrorHandler(w, err)
 			return
 		}
 		r = r.WithContext(context.WithValue(r.Context(), "id", id))

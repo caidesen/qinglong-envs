@@ -5,22 +5,22 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"log/slog"
+	"net/http"
 	"os"
-	"path"
-	"qinglong-envs/internal/handlers"
-	"qinglong-envs/internal/services"
-	"qinglong-envs/pkg/api"
+	"path/filepath"
+	apiv1 "qinglong-envs/internal/api/v1"
+	"qinglong-envs/internal/db/queries"
+	"qinglong-envs/pkg/httpapi"
 	"qinglong-envs/pkg/kv"
 	"qinglong-envs/pkg/middleware"
-	"qinglong-envs/pkg/router"
 )
 
 func checkPath(p string) string {
-	if path.IsAbs(p) {
+	if filepath.IsAbs(p) {
 		return p
 	}
 	dir, _ := os.Getwd()
-	return path.Join(dir, p)
+	return filepath.Join(dir, p)
 }
 
 func InitDB(dbPath string) *sql.DB {
@@ -51,17 +51,19 @@ func InitKVStore(db *sql.DB) kv.Store {
 func main() {
 	// 基础组件初始化
 	db := InitDB("./.tmp/data.db")
-	kvStore := InitKVStore(InitDB("./.tmp/kv.db"))
-	// service 初始化
-	tokenService := services.NewTokenService(kvStore)
-	userService := services.NewUserService(db, tokenService)
-	panelServer := services.NewPanelServer(db)
+	q := queries.New(db)
+	v1 := apiv1.New(q)
 	// 注册路由
-	r := router.NewRouter()
-	r.Use(middleware.Recovery)
-	r.GroupWithPrefix("/api", func(ar router.Router) {
-		ar.Group(handlers.NewUserHandler(userService).Register)
-		ar.Group(handlers.NewPanelHandler(panelServer).Register)
+	router := httpapi.NewRouter()
+	router.Use(middleware.Recovery)
+
+	router.Group(func(r httpapi.Router) {
+		v1.Register(r)
 	})
-	api.StartHttpServer(r)
+
+	mux := http.NewServeMux()
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
+	//router.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
+
+	httpapi.StartHttpServer(mux)
 }

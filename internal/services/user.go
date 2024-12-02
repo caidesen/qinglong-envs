@@ -6,7 +6,7 @@ import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 	"qinglong-envs/internal/db/queries"
-	"qinglong-envs/pkg/api"
+	"qinglong-envs/pkg/httpapi"
 )
 
 type UserService struct {
@@ -69,17 +69,17 @@ func (s *UserService) LoginByLocal(ctx context.Context, input UsernamePasswordIn
 	user, err := s.queries.GetUserByUsername(ctx, input.Username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, api.NotPermittedError("用户名或密码错误")
+			return nil, httpapi.NotPermittedError("用户名或密码错误")
 		}
 		return nil, err
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password.String), []byte(input.Password))
 	if err != nil {
-		return nil, api.NotPermittedError("用户名或密码错误")
+		return nil, httpapi.NotPermittedError("用户名或密码错误")
 	}
 	token, err := s.tokenService.CreateToken(ctx, user.ID)
 	if err != nil {
-		return nil, api.InternalError("登录失败: 创建令牌失败")
+		return nil, httpapi.InternalError("登录失败: 创建令牌失败")
 	}
 	return &LoginSuccess{Token: token}, nil
 }

@@ -1,4 +1,4 @@
-package api
+package httpapi
 
 import (
 	"encoding/json"
@@ -79,20 +79,17 @@ func ErrorHandler(w http.ResponseWriter, err error) {
 	httpErr.Out(w)
 }
 
-type Handler func(w http.ResponseWriter, r *http.Request) error
+type HandlerFunc func(w http.ResponseWriter, r *http.Request) error
 
-func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h(w, r)
 	if err != nil {
 		ErrorHandler(w, err)
-	} else {
-		w.Header().Set("Content-Length", "0")
-		w.WriteHeader(http.StatusOK)
 	}
 }
 
 type PaginationParams struct {
-	PageSize int `query:"limit"`
+	PageSize int `query:""`
 	Current  int `query:"current"`
 }
 
@@ -100,8 +97,12 @@ func (p *PaginationParams) Offset() int {
 	return (p.Current - 1) * p.PageSize
 }
 
-type Pagination[T any] struct {
+type PaginationResult[T any] struct {
 	Current int  `json:"current"`
 	Total   int  `json:"total"`
 	List    []*T `json:"list"`
+}
+
+func NewPaginationResult[T any](current, total int, list []*T) *PaginationResult[T] {
+	return &PaginationResult[T]{Current: current, Total: total, List: list}
 }

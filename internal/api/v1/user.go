@@ -1,10 +1,9 @@
-package handlers
+package apiv1
 
 import (
 	"net/http"
 	"qinglong-envs/internal/services"
-	"qinglong-envs/pkg/api"
-	"qinglong-envs/pkg/router"
+	"qinglong-envs/pkg/httpapi"
 )
 
 type UserHandler struct {
@@ -17,13 +16,13 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 	}
 }
 
-func (h *UserHandler) Register(r router.Router) {
-	r.Post("/users/login", api.Handler(h.loginByLocal))
-	r.Post("/users/register", api.Handler(h.register))
-}
+//func (h *UserHandler) R(r httpapi.Router) {
+//	r.Post("/users/login", httpapi.HandlerFunc(h.loginByLocal))
+//	r.Post("/users/register", httpapi.HandlerFunc(h.register))
+//}
 
 func (h *UserHandler) register(w http.ResponseWriter, r *http.Request) error {
-	input, err := api.BindJSONBody[services.UsernamePasswordInput](r)
+	input, err := httpapi.BindJSONBody[services.UsernamePasswordInput](r)
 	if err != nil {
 		return err
 	}
@@ -31,11 +30,11 @@ func (h *UserHandler) register(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	return api.Response(w, resp)
+	return httpapi.Response(w, resp)
 }
 
 func (h *UserHandler) loginByLocal(w http.ResponseWriter, r *http.Request) error {
-	input, err := api.BindJSONBody[services.UsernamePasswordInput](r)
+	input, err := httpapi.BindJSONBody[services.UsernamePasswordInput](r)
 	if err != nil {
 		return err
 	}
@@ -43,5 +42,5 @@ func (h *UserHandler) loginByLocal(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return err
 	}
-	return api.Response(w, resp)
+	return httpapi.Response(w, resp)
 }
