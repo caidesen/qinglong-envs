@@ -1,4 +1,4 @@
-package httpapi
+package httperr
 
 import (
 	"encoding/json"
@@ -6,11 +6,13 @@ import (
 	"net/http"
 )
 
-type HTTPError struct {
-	HttpStatus int    `json:"-"`
-	Message    string `json:"message,omitempty"`
-	Detail     any    `json:"detail,omitempty"`
-}
+type (
+	HTTPError struct {
+		HttpStatus int    `json:"-"`
+		Message    string `json:"message,omitempty"`
+		Detail     any    `json:"detail,omitempty"`
+	}
+)
 
 // Error makes it compatible with `error` interface.
 func (he *HTTPError) Error() string {
@@ -19,6 +21,11 @@ func (he *HTTPError) Error() string {
 
 func (he *HTTPError) WithDetail(detail any) *HTTPError {
 	he.Detail = detail
+	return he
+}
+
+func (he *HTTPError) WithMessage(message string) *HTTPError {
+	he.Message = message
 	return he
 }
 
@@ -42,22 +49,22 @@ func New(status int, message string) *HTTPError {
 	return e
 }
 
-func ValidateError(msg string) *HTTPError {
+func InputError(msg string) *HTTPError {
 	return New(http.StatusBadRequest, msg)
 }
 
-func NotFoundError(msg string) *HTTPError {
+func NotFound(msg string) *HTTPError {
 	return New(http.StatusNotFound, msg)
 }
 
-func InternalError(msg string) *HTTPError {
+func InternalServerError(msg string) *HTTPError {
 	return New(http.StatusInternalServerError, msg)
 }
 
-func NotPermittedError(msg string) *HTTPError {
+func NotPermitted(msg string) *HTTPError {
 	return New(http.StatusForbidden, msg)
 }
 
-func NotAuthorizedError(msg string) *HTTPError {
+func Unauthorized(msg string) *HTTPError {
 	return New(http.StatusUnauthorized, msg)
 }

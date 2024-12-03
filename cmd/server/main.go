@@ -4,15 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
-	apiv1 "qinglong-envs/internal/api/v1"
 	"qinglong-envs/internal/db/queries"
-	"qinglong-envs/pkg/httpapi"
+	"qinglong-envs/internal/server/api/v1"
 	"qinglong-envs/pkg/kv"
 	"qinglong-envs/pkg/middleware"
+	"qinglong-envs/pkg/router"
+	"strconv"
 )
 
 func checkPath(p string) string {
@@ -48,22 +50,39 @@ func InitKVStore(db *sql.DB) kv.Store {
 	return store
 }
 
+func LoadListeningFormEnv() string {
+	port := 3000
+	host := "127.0.0.1"
+	portEnv := os.Getenv("QINGLONG_ENVS_SERVER_PORT")
+	hostEnv := os.Getenv("QINGLONG_ENVS_SERVER_HOST")
+	// to int
+	portEnvInt, _ := strconv.Atoi(portEnv)
+	if portEnvInt != 0 {
+		port = portEnvInt
+	}
+	if hostEnv != "" {
+		host = hostEnv
+	}
+	return fmt.Sprintf("%s:%d", host, port)
+}
+
+func StartHttpServer(h http.Handler) {
+	addr := LoadListeningFormEnv()
+	server := &http.Server{
+		Addr:    addr,
+		Handler: h,
+	}
+	slog.Info(fmt.Sprintf("listening on %s", addr))
+	log.Fatal(server.ListenAndServe())
+}
+
 func main() {
 	// 基础组件初始化
 	db := InitDB("./.tmp/data.db")
 	q := queries.New(db)
-	v1 := apiv1.New(q)
 	// 注册路由
-	router := httpapi.NewRouter()
-	router.Use(middleware.Recovery)
-
-	router.Group(func(r httpapi.Router) {
-		v1.Register(r)
-	})
-
-	mux := http.NewServeMux()
-	mux.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
-	//router.Handle("/api/v1/", http.StripPrefix("/api/v1/", router))
-
-	httpapi.StartHttpServer(mux)
+	r := router.New(http.NewServeMux())
+	r.Use(middleware.Recovery)
+	r.Mount("/api/v1").Route(v1.NewHandlers(q).Routes)
+	StartHttpServer(r)
 }
