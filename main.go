@@ -76,6 +76,12 @@ func StartHttpServer(h http.Handler) {
 	log.Fatal(server.ListenAndServe())
 }
 
+//	@title			Qinglong Envs
+//	@version		1.0
+//	@description	Qinglong Envs API
+
+// @host		localhost:3000
+// @BasePath	/api/v1
 func main() {
 	// 基础组件初始化
 	db := InitDB("./.tmp/data.db")

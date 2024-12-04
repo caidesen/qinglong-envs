@@ -55,10 +55,13 @@ func (p *PaginationParams) Offset() int {
 	return (p.Current - 1) * p.PageSize
 }
 
+// PaginationResult PaginationResult[T]
+//
+//	@Description		分页查询结果
 type PaginationResult[T any] struct {
-	Current int  `json:"current"`
-	Total   int  `json:"total"`
-	List    []*T `json:"list"`
+	Current int `json:"current"`
+	Total   int `json:"total"`
+	List    []T `json:"list"`
 }
 
 func NewPaginationResult[T any](current, total int, list []*T) *PaginationResult[T] {

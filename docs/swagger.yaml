@@ -1,0 +1,192 @@
+basePath: /api/v1
+definitions:
+  httperr.HTTPError:
+    properties:
+      detail: {}
+      message:
+        type: string
+    type: object
+  queries.CreatePanelParams:
+    properties:
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  queries.Panel:
+    properties:
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      createdAt:
+        type: string
+      id:
+        example: "0"
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  queries.UpdatePanelParams:
+    properties:
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      id:
+        example: "0"
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  server.PaginationResult-queries_Panel:
+    properties:
+      current:
+        type: integer
+      list:
+        items:
+          $ref: '#/definitions/queries.Panel'
+        type: array
+      total:
+        type: integer
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Qinglong Envs API
+  title: Qinglong Envs
+  version: "1.0"
+paths:
+  /api/panels:
+    get:
+      consumes:
+      - application/json
+      description: 获取面板列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.PaginationResult-queries_Panel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+      summary: 获取面板列表
+      tags:
+      - panel
+    post:
+      consumes:
+      - application/json
+      description: 创建面板
+      parameters:
+      - description: 创建面板
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/queries.CreatePanelParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+      summary: 创建面板
+      tags:
+      - panel
+  /api/panels/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除面板
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+      summary: 删除面板
+      tags:
+      - panel
+    get:
+      consumes:
+      - application/json
+      description: 获取面板
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/queries.Panel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+      summary: 获取面板
+      tags:
+      - panel
+    put:
+      consumes:
+      - application/json
+      description: 更新面板
+      parameters:
+      - description: 更新面板
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/queries.UpdatePanelParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/queries.Panel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperr.HTTPError'
+      summary: 更新面板
+      tags:
+      - panel
+swagger: "2.0"
