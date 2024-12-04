@@ -17,20 +17,39 @@ export const Route = createFileRoute("/admin/panel")({
     </div>
   ),
 })
+type TableColumnType = {
+  key: keyof api.Panel
+  label: string
+}
 
 function RouteComponent() {
   const getPanelsQuery = useQuery({
     queryKey: ["get /panels"],
     queryFn: async () => api.getPanels(),
   })
+  const columus: TableColumnType[] = [
+    {
+      key: "id",
+      label: "ID",
+    },
+    {
+      key: "name",
+      label: "名称",
+    },
+    {
+      key: "clientId",
+      label: "clientId",
+    },
+    {
+      key: "clientSecret",
+      label: "clientSecret",
+    },
+  ]
   return (
     <div>
       <Table>
-        <TableHeader>
-          <TableColumn>名称</TableColumn>
-          <TableColumn>url</TableColumn>
-          <TableColumn>client_id</TableColumn>
-          <TableColumn>client_secret</TableColumn>
+        <TableHeader columns={columus}>
+          {(it) => <TableColumn>{it.label}</TableColumn>}
         </TableHeader>
         <TableBody emptyContent="No rows to display.">{[]}</TableBody>
       </Table>
