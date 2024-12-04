@@ -1,54 +1,51 @@
-// export interface Request {
-//   <T>(url: string, options: RequestInit): Promise<T>
-// }
-//
-// async function fetchResultHandle(res: Response) {
-//   const isJSONBody = res.headers
-//     .get("content-type")
-//     ?.includes("application/json")
-//   const body = isJSONBody ? await res.json() : undefined
-//   if (!res.ok) {
-//     const msg = body ? body.message : `request fall: ${res.statusText}`
-//     throw new Error(msg)
-//   }
-//   if (!isJSONBody) return res
-//   return body
-// }
-//
-// function timeoutAbort(signal: AbortSignal | null | undefined) {
-//   const abortController = new AbortController()
-//   setTimeout(() => abortController.abort("timeout"), 1000 * 5)
-//   if (signal)
-//     signal.onabort = (ev) => {
-//       abortController.abort((ev.target as AbortSignal)?.reason ?? "aborted")
-//     }
-//   return abortController.signal
-// }
-//
-// export const request: Request = async (url, options = {}) => {
-//   try {
-//     const res = await fetch("/api" + url, {
-//       ...options,
-//       signal: timeoutAbort(options.signal),
-//     })
-//     return await fetchResultHandle(res)
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       throw error
-//     } else {
-//       throw new Error(String(error))
-//     }
-//   }
-// }
-//
-export function buildQuery(params: Record<string, any>) {
-  return Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&")
+// import ky, { type Options } from "ky"
+import { HTTPError } from "../apis"
+
+const baseURL = "/api/v1"
+
+type requestOptions = RequestInit & {
+  data?: Record<string, unknown>
+  params?: Record<string, unknown>
 }
 
-import ky from "ky"
+class APIError extends Error {
+  response?: Response
+  data?: HTTPError
 
-export const request = ky.extend({
-  prefixUrl: "/api",
-})
+  constructor(response: Response, body?: HTTPError) {
+    super(body?.message)
+    this.response = response
+    this.data = body
+  }
+}
+
+function safetyParseJSONBody(resp: Response) {
+  if (!resp.headers.get("Content-Type")?.includes("application/json"))
+    return null
+  try {
+    return resp.json()
+  } catch {
+    return null
+  }
+}
+
+async function request<T>(url: string, opt: requestOptions = {}): Promise<T> {
+  const { data, params, ...optWithoutData } = opt
+  const fetchURL = new URL(baseURL + url, document.baseURI)
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      fetchURL.searchParams.set(key, String(value))
+    }
+  }
+  const resp = await fetch(fetchURL, {
+    ...optWithoutData,
+    body: data ? JSON.stringify(data) : undefined,
+  })
+  const body = await safetyParseJSONBody(resp)
+  if (!resp.ok) {
+    throw new APIError(resp, body)
+  }
+  return body as T
+}
+
+export default request

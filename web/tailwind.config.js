@@ -6,7 +6,7 @@ export default {
   content: [
     "./src/pages/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
-    "./node_modules/@nextui-org/theme/dist/components/(button|tabs|ripple|spinner).js",
+    "./node_modules/@nextui-org/theme/dist/components/(button|spinner|table|tabs|ripple|checkbox|spacer).js",
   ],
   theme: {
     extend: {},

@@ -1,16 +1,16 @@
 import {
-  createFileRoute,
+  createLazyFileRoute,
   Link,
   LinkProps,
   Outlet,
   useRouterState,
-} from "@tanstack/react-router"
-import { Tab, Tabs } from "@nextui-org/tabs"
-import * as React from "react"
-import { FiDatabase, FiLayout, FiSettings } from "react-icons/fi"
-import { type IconType } from "react-icons"
+} from '@tanstack/react-router'
+import { Tab, Tabs } from '@nextui-org/tabs'
+import * as React from 'react'
+import { FiDatabase, FiLayout, FiSettings } from 'react-icons/fi'
+import { type IconType } from 'react-icons'
 
-export const Route = createFileRoute("/admin")({
+export const Route = createLazyFileRoute('/admin')({
   component: RouteComponent,
 })
 
@@ -18,22 +18,22 @@ const Nav: React.FC = () => {
   const pathname = useRouterState().location.pathname
   const navList = [
     {
-      to: "/admin/panel",
-      title: "面板",
+      to: '/admin/panel',
+      title: '面板',
       icon: FiDatabase,
     },
     {
-      to: "/admin/project",
-      title: "项目",
+      to: '/admin/project',
+      title: '项目',
       icon: FiLayout,
     },
     {
-      to: "/admin/settings",
-      title: "设置",
+      to: '/admin/settings',
+      title: '设置',
       icon: FiSettings,
     },
   ] as const satisfies ReadonlyArray<{
-    to: LinkProps["to"]
+    to: LinkProps['to']
     title: string
     icon: IconType
   }>
@@ -45,8 +45,8 @@ const Nav: React.FC = () => {
       color="primary"
       selectedKey={pathname}
       classNames={{
-        tabList: "p-0",
-        tab: "h-12",
+        tabList: 'p-0',
+        tab: 'h-12',
       }}
     >
       {navList.map(({ to, title, icon: Icon }) => (

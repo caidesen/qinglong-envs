@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"log/slog"
@@ -76,19 +77,19 @@ func StartHttpServer(h http.Handler) {
 	log.Fatal(server.ListenAndServe())
 }
 
-//	@title			Qinglong Envs
-//	@version		1.0
-//	@description	Qinglong Envs API
-
-// @host		localhost:3000
-// @BasePath	/api/v1
+// @title			Qinglong Envs
+// @version		1.0
+// @description	Qinglong Envs API
+// @host			localhost:3000
+// @BasePath		/api/v1
 func main() {
 	// 基础组件初始化
+	validate := validator.New()
 	db := InitDB("./.tmp/data.db")
 	q := queries.New(db)
 	// 注册路由
 	r := router.New(http.NewServeMux())
 	r.Use(middleware.Recovery)
-	r.Mount("/api/v1").Route(v1.NewHandlers(q).Routes)
+	r.Mount("/api/v1").Route(apiv1.NewHandlers(q, validate).Routes)
 	StartHttpServer(r)
 }

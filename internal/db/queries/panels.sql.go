@@ -9,7 +9,9 @@ import (
 	"context"
 )
 
-const createPanel = `-- name: Create :one
+const createPanel = `-- name: CreatePanel :one
+;
+
 INSERT INTO panels (name, url, client_id, client_secret)
 VALUES (?, ?, ?, ?)
 RETURNING id, created_at, updated_at, name, url, client_id, client_secret
@@ -75,20 +77,14 @@ func (q *Queries) GetPanelByID(ctx context.Context, id int) (*Panel, error) {
 	return &i, err
 }
 
-const listPanels = `-- name: List :many
+const listPanels = `-- name: ListPanels :many
 SELECT id, created_at, updated_at, name, url, client_id, client_secret
 FROM panels
 ORDER BY id
-LIMIT ? OFFSET ?
 `
 
-type ListPanelsParams struct {
-	Limit  int `json:"limit"`
-	Offset int `json:"offset"`
-}
-
-func (q *Queries) ListPanels(ctx context.Context, arg ListPanelsParams) ([]*Panel, error) {
-	rows, err := q.db.QueryContext(ctx, listPanels, arg.Limit, arg.Offset)
+func (q *Queries) ListPanels(ctx context.Context) ([]*Panel, error) {
+	rows, err := q.db.QueryContext(ctx, listPanels)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +114,7 @@ func (q *Queries) ListPanels(ctx context.Context, arg ListPanelsParams) ([]*Pane
 	return items, nil
 }
 
-const updatePanel = `-- name: Update :exec
+const updatePanel = `-- name: UpdatePanel :exec
 UPDATE panels
 SET name          = ?,
     url           = ?,

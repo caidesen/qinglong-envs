@@ -7,8 +7,7 @@ LIMIT 1;
 -- name: ListPanels :many
 SELECT *
 FROM panels
-ORDER BY id
-LIMIT ? OFFSET ?;
+ORDER BY id ;
 
 -- name: CreatePanel :one
 INSERT INTO panels (name, url, client_id, client_secret)

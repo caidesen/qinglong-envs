@@ -11,4 +11,17 @@ export default defineConfig({
       routeFileIgnorePattern: "components",
     }),
   ],
+  server: {
+    proxy: {
+      "/api": "http://localhost:3000",
+    },
+  },
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+  build: {
+    outDir: "dist",
+  },
 })
