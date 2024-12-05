@@ -4,10 +4,8 @@ export default [
   {
     schemaPath: "../docs/swagger.yaml",
     requestLibPath: "@/utils/http",
-    // hook: {
-    //   customFunctionName(data: APIDataType) {
-    //     return ''
-    //   }
-    // },
+    requestImportStatement: `import request, {type RequestOptions} from "@/utils/http"`,
+    requestOptionsType: "RequestOptions",
+    serversPath: "./src/apis",
   },
 ] as GenerateServiceProps[]

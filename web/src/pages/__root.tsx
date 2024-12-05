@@ -1,24 +1,11 @@
-import { createRootRoute, Outlet, useRouter } from "@tanstack/react-router"
+import { createRootRoute, Outlet } from "@tanstack/react-router"
 import React from "react"
-import { NextUIProvider } from "@nextui-org/system"
+
+import "@mantine/core/styles.css"
+import { MantineProvider } from "@mantine/core"
 
 const Provider: React.FC<React.PropsWithChildren> = (props) => {
-  const router = useRouter()
-  console.log("x")
-  return (
-    <NextUIProvider
-      locale="zh-CN"
-      navigate={(to) => {
-        alert(1)
-        return router.navigate({ to })
-      }}
-      useHref={(to) => {
-        return router.buildLocation({ to }).href
-      }}
-    >
-      {props.children}
-    </NextUIProvider>
-  )
+  return <MantineProvider>{props.children}</MantineProvider>
 }
 
 const RootLayout: React.FC = () => {

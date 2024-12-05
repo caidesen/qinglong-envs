@@ -1,20 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import * as api from "@/apis"
-import { Table, TableBody, TableColumn, TableHeader } from "@nextui-org/table"
-import { Spinner } from "@nextui-org/spinner"
 
 export const Route = createFileRoute("/admin/panel")({
   component: RouteComponent,
-  loader() {
-    return new Promise((resolve) => {
-      setTimeout(resolve, 2000)
-    })
-  },
   pendingComponent: () => (
-    <div className="pt-[10vh] text-center">
-      <Spinner></Spinner>
-    </div>
+    <div className="pt-[10vh] text-center">loading...</div>
   ),
 })
 type TableColumnType = {
@@ -46,14 +37,11 @@ function RouteComponent() {
     },
   ]
   return (
-    <div>
-      <Table>
-        <TableHeader columns={columus}>
-          {(it) => <TableColumn>{it.label}</TableColumn>}
-        </TableHeader>
-        <TableBody emptyContent="No rows to display.">{[]}</TableBody>
-      </Table>
-      {getPanelsQuery.data?.toString()}
+    <div className="flex-col flex gap-4">
+      <div className="flex gap-3">
+        <div className="flex-1"></div>
+        <div></div>
+      </div>
     </div>
   )
 }

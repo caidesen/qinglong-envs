@@ -9,20 +9,20 @@ import (
 )
 
 type (
-	CreatePanelInput struct {
+	CreatePanelParams struct {
 		Name         string `json:"name" validate:"required,min=1,max=64"`
 		Url          string `json:"url" validate:"required,url"`
 		ClientID     string `json:"clientId" validate:"required,min=1,max=128"`
 		ClientSecret string `json:"clientSecret" validate:"required,min=1,max=128"`
 	}
 
-	UpdatePanelInput struct {
+	UpdatePanelParams struct {
 		ID int `json:"id" validate:"required"`
-		CreatePanelInput
+		CreatePanelParams
 	}
 )
 
-func (i *CreatePanelInput) Q() queries.CreatePanelParams {
+func (i *CreatePanelParams) Q() queries.CreatePanelParams {
 	return queries.CreatePanelParams{
 		Name:         i.Name,
 		Url:          i.Url,
@@ -30,7 +30,7 @@ func (i *CreatePanelInput) Q() queries.CreatePanelParams {
 		ClientSecret: i.ClientSecret,
 	}
 }
-func (i *UpdatePanelInput) Q() queries.UpdatePanelParams {
+func (i *UpdatePanelParams) Q() queries.UpdatePanelParams {
 	return queries.UpdatePanelParams{
 		ID:           i.ID,
 		Name:         i.Name,
@@ -42,18 +42,17 @@ func (i *UpdatePanelInput) Q() queries.UpdatePanelParams {
 
 // CreatePanel 创建面板
 //
-//	@Summary		创建面板
-//	@Description	创建面板
-//	@Tags			panel
-//	@Accept			json
-//	@Produce		json
-//	@Param			input	body	CreatePanelInput	true	"创建面板"
-//	@Success		200
-//	@Failure		400	{object}	httperr.HTTPError
-//	@Failure		500	{object}	httperr.HTTPError
-//	@Router			/panels [post]
+//	@Summary	创建面板
+//	@Tags		panel
+//	@Accept		json
+//	@Produce	json
+//	@Param		input	body	CreatePanelParams	true	"创建面板"
+//	@Success	200
+//	@Failure	400	{object}	httperr.HTTPError
+//	@Failure	500	{object}	httperr.HTTPError
+//	@Router		/panels [post]
 func (h *Handlers) CreatePanel(w http.ResponseWriter, r *http.Request) {
-	var input CreatePanelInput
+	var input CreatePanelParams
 	err := h.BindJSON(r, &input)
 	if err != nil {
 		h.WriteErr(w, err)
@@ -74,18 +73,17 @@ func (h *Handlers) CreatePanel(w http.ResponseWriter, r *http.Request) {
 
 // UpdatePanel 更新面板
 //
-//	@Summary		更新面板
-//	@Description	更新面板
-//	@Tags			panel
-//	@Accept			json
-//	@Produce		json
-//	@Param			input	body		UpdatePanelInput	true	"创建面板"
-//	@Success		200		{object}	queries.Panel
-//	@Failure		400		{object}	httperr.HTTPError
-//	@Failure		500		{object}	httperr.HTTPError
-//	@Router			/panels [put]
+//	@Summary	更新面板
+//	@Tags		panel
+//	@Accept		json
+//	@Produce	json
+//	@Param		input	body		UpdatePanelParams	true	"创建面板"
+//	@Success	200		{object}	queries.Panel
+//	@Failure	400		{object}	httperr.HTTPError
+//	@Failure	500		{object}	httperr.HTTPError
+//	@Router		/panels [put]
 func (h *Handlers) UpdatePanel(w http.ResponseWriter, r *http.Request) {
-	var input UpdatePanelInput
+	var input UpdatePanelParams
 	err := h.BindJSON(r, &input)
 	if err != nil {
 		h.WriteErr(w, err)
@@ -100,16 +98,15 @@ func (h *Handlers) UpdatePanel(w http.ResponseWriter, r *http.Request) {
 
 // DeletePanel 删除面板
 //
-//	@Summary		删除面板
-//	@Description	删除面板
-//	@Tags			panel
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path	int	true	"面板ID"
-//	@Success		200
-//	@Failure		400	{object}	httperr.HTTPError
-//	@Failure		500	{object}	httperr.HTTPError
-//	@Router			/panels/{id} [delete]
+//	@Summary	删除面板
+//	@Tags		panel
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path	int	true	"面板ID"
+//	@Success	200
+//	@Failure	400	{object}	httperr.HTTPError
+//	@Failure	500	{object}	httperr.HTTPError
+//	@Router		/panels/{id} [delete]
 func (h *Handlers) DeletePanel(w http.ResponseWriter, r *http.Request) {
 	id, err := h.GetIntInPath(r, "id")
 	if err != nil {
@@ -125,16 +122,15 @@ func (h *Handlers) DeletePanel(w http.ResponseWriter, r *http.Request) {
 
 // GetPanelById 获取面板
 //
-//	@Summary		获取面板
-//	@Description	获取面板
-//	@Tags			panel
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path		int	true	"面板ID"
-//	@Success		200	{object}	queries.Panel
-//	@Failure		400	{object}	httperr.HTTPError
-//	@Failure		500	{object}	httperr.HTTPError
-//	@Router			/panels/{id} [get]
+//	@Summary	获取面板
+//	@Tags		panel
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"面板ID"
+//	@Success	200	{object}	queries.Panel
+//	@Failure	400	{object}	httperr.HTTPError
+//	@Failure	500	{object}	httperr.HTTPError
+//	@Router		/panels/{id} [get]
 func (h *Handlers) GetPanelById(w http.ResponseWriter, r *http.Request) {
 	id, err := h.GetIntInPath(r, "id")
 	if err != nil {
@@ -156,15 +152,14 @@ func (h *Handlers) GetPanelById(w http.ResponseWriter, r *http.Request) {
 
 // ListPanels 获取面板列表
 //
-//	@Summary		获取面板列表
-//	@Description	获取面板列表
-//	@Tags			panel
-//	@Accept			json
-//	@Produce		json
-//	@Success		200	{array}		queries.Panel
-//	@Failure		400	{object}	httperr.HTTPError
-//	@Failure		500	{object}	httperr.HTTPError
-//	@Router			/panels [get]
+//	@Summary	获取面板列表
+//	@Tags		panel
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{array}		queries.Panel
+//	@Failure	400	{object}	httperr.HTTPError
+//	@Failure	500	{object}	httperr.HTTPError
+//	@Router		/panels [get]
 func (h *Handlers) ListPanels(w http.ResponseWriter, r *http.Request) {
 	panels, err := h.queries.ListPanels(r.Context())
 	if err != nil {

@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-ignore
 
-export type CreatePanelInput = {
+export type CreatePanelParams = {
   clientId: string;
   clientSecret: string;
   name: string;
@@ -33,7 +33,7 @@ export type Panel = {
   url?: string;
 };
 
-export type UpdatePanelInput = {
+export type UpdatePanelParams = {
   clientId: string;
   clientSecret: string;
   id: number;

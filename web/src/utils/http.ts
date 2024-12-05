@@ -1,9 +1,6 @@
-// import ky, { type Options } from "ky"
-import { HTTPError } from "../apis"
+import { HTTPError } from "@/apis"
 
-const baseURL = "/api/v1"
-
-type requestOptions = RequestInit & {
+export type RequestOptions = RequestInit & {
   data?: Record<string, unknown>
   params?: Record<string, unknown>
 }
@@ -29,20 +26,22 @@ function safetyParseJSONBody(resp: Response) {
   }
 }
 
-async function request<T>(url: string, opt: requestOptions = {}): Promise<T> {
+const baseURL = new URL("/api/v1", document.baseURI).toString()
+
+async function request<T>(url: string, opt: RequestOptions = {}): Promise<T> {
   const { data, params, ...optWithoutData } = opt
-  const fetchURL = new URL(baseURL + url, document.baseURI)
-  if (params) {
+  const fetchURL = new URL(baseURL + url)
+  if (params)
     for (const [key, value] of Object.entries(params)) {
       fetchURL.searchParams.set(key, String(value))
     }
-  }
   const resp = await fetch(fetchURL, {
     ...optWithoutData,
     body: data ? JSON.stringify(data) : undefined,
   })
   const body = await safetyParseJSONBody(resp)
   if (!resp.ok) {
+    // error handle
     throw new APIError(resp, body)
   }
   return body as T
