@@ -1,11 +1,8 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router"
 import React from "react"
 
-import "@mantine/core/styles.css"
-import { MantineProvider } from "@mantine/core"
-
 const Provider: React.FC<React.PropsWithChildren> = (props) => {
-  return <MantineProvider>{props.children}</MantineProvider>
+  return <div>{props.children}</div>
 }
 
 const RootLayout: React.FC = () => {
